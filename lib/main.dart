@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = GeneratorPage();
         break;
       case 1:
-        page = Placeholder();
+        page = FavoritesPage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -144,6 +144,34 @@ class GeneratorPage extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    final theme = Theme.of(context);
+    final style = theme.textTheme.displaySmall!.copyWith(
+        color: theme.colorScheme.secondary, fontWeight: FontWeight.bold);
+
+    if (appState.favorites.isEmpty) {
+      return Center(
+        child: Text('No favorites yet.'),
+      );
+    }
+    return (ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('You have ${appState.favorites.length} favorites:',
+              style: style),
+        ),
+        for (var favorite in appState.favorites)
+          ListTile(
+              leading: Icon(Icons.favorite), title: Text(favorite.asLowerCase)),
+      ],
+    ));
   }
 }
 
