@@ -28,8 +28,14 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
   var favorites = <WordPair>[];
+  var history = <WordPair>[];
+
+  GlobalKey? historyListKey;
 
   void getNext() {
+    history.insert(0, current);
+    var animatedList = historyListKey?.currentState as AnimatedListState?;
+    animatedList?.insertItem(0);
     current = WordPair.random();
     notifyListeners();
   }
@@ -120,6 +126,8 @@ class GeneratorPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Expanded(flex: 3, child: HistoryListView()),
+          SizedBox(height: 10),
           BigCard(pair: pair),
           SizedBox(height: 10),
           Row(
@@ -141,9 +149,65 @@ class GeneratorPage extends StatelessWidget {
               ),
             ],
           ),
+          Spacer(flex: 3)
         ],
       ),
     );
+  }
+}
+
+class HistoryListView extends StatefulWidget {
+  const HistoryListView({Key? key}) : super(key: key);
+
+  @override
+  State<HistoryListView> createState() => _HistoryListViewState();
+}
+
+class _HistoryListViewState extends State<HistoryListView> {
+  final _key = GlobalKey();
+
+  static const Gradient _maskingGradient = LinearGradient(
+    colors: [Colors.transparent, Colors.black],
+    stops: [0.0, 0.7],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    appState.historyListKey = _key;
+
+    if (appState.history.isEmpty) {
+      return Center(
+        child: SizedBox(),
+      );
+    }
+
+    return ShaderMask(
+        shaderCallback: (bounds) => _maskingGradient.createShader(bounds),
+        blendMode: BlendMode.dstIn,
+        child: (AnimatedList(
+            key: _key,
+            reverse: true,
+            padding: EdgeInsets.only(top: 100),
+            initialItemCount: appState.history.length,
+            itemBuilder: (context, index, animation) {
+              final pair = appState.history[index];
+              return SizeTransition(
+                  sizeFactor: animation,
+                  child: Center(
+                      child: TextButton.icon(
+                          onPressed: () {
+                            appState.toggleFavorite();
+                          },
+                          icon: appState.favorites.contains(pair)
+                              ? Icon(Icons.favorite, size: 12)
+                              : SizedBox(),
+                          label: Text(
+                            pair.asLowerCase,
+                            semanticsLabel: pair.asPascalCase,
+                          ))));
+            })));
   }
 }
 
@@ -186,19 +250,31 @@ class BigCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final style = theme.textTheme.displayMedium!.copyWith(
-      color: theme.colorScheme.onPrimary,
-    );
+    final firstStyle = theme.textTheme.displayMedium!.copyWith(
+        color: theme.colorScheme.onPrimary, fontWeight: FontWeight.w200);
+    final secondStyle = theme.textTheme.displayMedium!.copyWith(
+        color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold);
 
     return Card(
       color: theme.colorScheme.primary,
       elevation: 5,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Text(
-          pair.asLowerCase,
-          style: style,
-          semanticsLabel: "${pair.first} ${pair.second}",
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              pair.first,
+              style: firstStyle,
+              semanticsLabel: "${pair.first} ${pair.second}",
+            ),
+            Text(
+              pair.second,
+              style: secondStyle,
+              semanticsLabel: "${pair.first} ${pair.second}",
+            ),
+          ],
         ),
       ),
     );
