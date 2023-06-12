@@ -73,28 +73,43 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         page = FavoritesPage();
         break;
+      case 2:
+        page = PlaceLayoutPage();
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
         appBar: AppBar(
-          title: Center(
-            child: Text(
-              'Word Pair Generator',
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "Prompt",
-                fontWeight: FontWeight.normal,
+          elevation: 4,
+          centerTitle: true,
+          title: Text(
+            'Practice App',
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: "Prompt",
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color.fromARGB(255, 168, 46, 37),
+                  const Color.fromARGB(255, 186, 116, 12)
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
           ),
-          backgroundColor: Color.fromARGB(255, 181, 53, 14),
+          shadowColor: Colors.black,
         ),
         body: Row(
           children: [
             SafeArea(
               child: NavigationRail(
+                backgroundColor: Colors.white,
                 extended: constraints.maxWidth >= 600,
                 destinations: [
                   NavigationRailDestination(
@@ -104,6 +119,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   NavigationRailDestination(
                     icon: Icon(Icons.favorite),
                     label: Text('Favorites'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.place),
+                    label: Text('Places'),
                   )
                 ],
                 selectedIndex: selectedIndex,
@@ -299,22 +318,190 @@ class BigCard extends StatelessWidget {
       elevation: 5,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              pair.first,
-              style: firstStyle,
-              semanticsLabel: "${pair.first} ${pair.second}",
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    pair.first,
+                    style: firstStyle,
+                    semanticsLabel: "${pair.first} ${pair.second}",
+                  ),
+                ),
+                Flexible(
+                  child: Text(
+                    pair.second,
+                    style: secondStyle,
+                    semanticsLabel: "${pair.first} ${pair.second}",
+                  ),
+                ),
+              ],
             ),
-            Text(
-              pair.second,
-              style: secondStyle,
-              semanticsLabel: "${pair.first} ${pair.second}",
-            ),
-          ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class PlaceLayoutPage extends StatelessWidget {
+  const PlaceLayoutPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Center(child: PlaceCard()),
+    );
+  }
+}
+
+class PlaceCard extends StatelessWidget {
+  const PlaceCard({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black38,
+            offset: const Offset(
+              5.0,
+              5.0,
+            ),
+            blurRadius: 20.0,
+            spreadRadius: 1.0,
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
+            child: Image.asset('images/lake.jpg'),
+          ),
+          _titleSection(),
+          _buttonsSection(),
+          _textSection(
+              'Lake Oeschinen lies at the foot of the Blüemlisalp in the Bernese '
+              'Alps. Situated 1,578 meters above sea level, it is one of the '
+              'larger Alpine Lakes. A gondola ride from Kandersteg, followed by a '
+              'half-hour walk through pastures and pine forest, leads you to the '
+              'lake, which warms to 20 degrees Celsius in the summer. Activities '
+              'enjoyed here include rowing, and riding the summer toboggan run.'),
+        ],
+      ),
+    );
+  }
+
+  Padding _textSection(String text) {
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Text(
+        text,
+        softWrap: true,
+      ),
+    );
+  }
+
+  Container _buttonsSection() {
+    final textStyle = TextStyle(color: Colors.blue);
+    return Container(
+      padding: EdgeInsets.only(top: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Icon(
+                  Icons.call,
+                  color: Colors.blue,
+                ),
+              ),
+              Text(
+                'CALL',
+                style: textStyle,
+              ),
+            ],
+          ),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Icon(
+                  Icons.near_me,
+                  color: Colors.blue,
+                ),
+              ),
+              Text(
+                'ROUTE',
+                style: textStyle,
+              ),
+            ],
+          ),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Icon(Icons.share, color: Colors.blue),
+              ),
+              Text(
+                'SHARE',
+                style: textStyle,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container _titleSection() {
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Oeschinen Lake Campground',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Kandersteg, Switzerland',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Icon(Icons.star, color: Colors.red[400]),
+          Text('41'),
+        ],
       ),
     );
   }
