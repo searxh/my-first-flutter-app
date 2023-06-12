@@ -78,6 +78,19 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
+        appBar: AppBar(
+          title: Center(
+            child: Text(
+              'Word Pair Generator',
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Prompt",
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ),
+          backgroundColor: Color.fromARGB(255, 181, 53, 14),
+        ),
         body: Row(
           children: [
             SafeArea(
@@ -189,30 +202,34 @@ class _HistoryListViewState extends State<HistoryListView> {
     }
 
     return ShaderMask(
-        shaderCallback: (bounds) => _maskingGradient.createShader(bounds),
-        blendMode: BlendMode.dstIn,
-        child: (AnimatedList(
-            key: _key,
-            reverse: true,
-            padding: EdgeInsets.only(top: 100),
-            initialItemCount: appState.history.length,
-            itemBuilder: (context, index, animation) {
-              final pair = appState.history[index];
-              return SizeTransition(
-                  sizeFactor: animation,
-                  child: Center(
-                      child: TextButton.icon(
-                          onPressed: () {
-                            appState.toggleFavorite();
-                          },
-                          icon: appState.favorites.contains(pair)
-                              ? Icon(Icons.favorite, size: 12)
-                              : SizedBox(),
-                          label: Text(
-                            pair.asLowerCase,
-                            semanticsLabel: pair.asPascalCase,
-                          ))));
-            })));
+      shaderCallback: (bounds) => _maskingGradient.createShader(bounds),
+      blendMode: BlendMode.dstIn,
+      child: (AnimatedList(
+          key: _key,
+          reverse: true,
+          padding: EdgeInsets.only(top: 100),
+          initialItemCount: appState.history.length,
+          itemBuilder: (context, index, animation) {
+            final pair = appState.history[index];
+            return SizeTransition(
+              sizeFactor: animation,
+              child: Center(
+                child: TextButton.icon(
+                  onPressed: () {
+                    appState.toggleFavorite();
+                  },
+                  icon: appState.favorites.contains(pair)
+                      ? Icon(Icons.favorite, size: 12)
+                      : SizedBox(),
+                  label: Text(
+                    pair.asLowerCase,
+                    semanticsLabel: pair.asPascalCase,
+                  ),
+                ),
+              ),
+            );
+          })),
+    );
   }
 }
 
@@ -273,7 +290,9 @@ class BigCard extends StatelessWidget {
     final firstStyle = theme.textTheme.displayMedium!.copyWith(
         color: theme.colorScheme.onPrimary, fontWeight: FontWeight.w200);
     final secondStyle = theme.textTheme.displayMedium!.copyWith(
-        color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold);
+        color: theme.colorScheme.onPrimary,
+        fontWeight: FontWeight.bold,
+        fontFamily: "Prompt");
 
     return Card(
       color: theme.colorScheme.primary,
